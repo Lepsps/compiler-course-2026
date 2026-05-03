@@ -77,5 +77,3 @@ body:             |
     %8:gr64 = SUB64rr %0, %2, implicit-def $eflags
     JCC_1 %bb.2, 4, implicit $eflags
     JMP_1 %bb.3
-
-...
