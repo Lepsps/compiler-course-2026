@@ -22,7 +22,8 @@ uint64_t calculateNestingDepth(Operation *op) {
   for (Region &region : op->getRegions()) {
     for (Block &block : region.getBlocks()) {
       for (Operation &childOp : block.getOperations()) {
-        maxInnerDepth = std::max(maxInnerDepth, calculateNestingDepth(&childOp));
+        maxInnerDepth =
+            std::max(maxInnerDepth, calculateNestingDepth(&childOp));
       }
     }
   }
@@ -33,10 +34,11 @@ uint64_t calculateNestingDepth(Operation *op) {
 
 struct DepthAnalyzerPass
     : public PassWrapper<DepthAnalyzerPass, OperationPass<ModuleOp>> {
-  
+
   StringRef getArgument() const final { return "shekhirev_v_max_depth_MLIR"; }
   StringRef getDescription() const final {
-    return "Analyzes functions to find max control-flow depth and adds it as an attribute.";
+    return "Analyzes functions to find max control-flow depth and adds it as "
+           "an attribute.";
   }
 
   void runOnOperation() override {
