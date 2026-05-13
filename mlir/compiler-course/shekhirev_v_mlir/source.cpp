@@ -4,9 +4,11 @@
 #include "mlir/IR/Builders.h"
 #include "mlir/Pass/Pass.h"
 #include "mlir/Tools/Plugins/PassPlugin.h"
-#include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/Debug.h"
 
 using namespace mlir;
+
+#define DEBUG_TYPE "shekhirev-max-depth"
 
 namespace {
 
@@ -48,16 +50,14 @@ struct DepthAnalyzerPass
     for (auto func : module.getOps<func::FuncOp>()) {
       uint64_t maxFuncDepth = 0;
 
-      for (Block &block : func.getBody()) {
-        for (Operation &op : block.getOperations()) {
-          maxFuncDepth = std::max(maxFuncDepth, calculateNestingDepth(&op));
-        }
-      }
+      func.walk([&](Operation *op) {
+        maxFuncDepth = std::max(maxFuncDepth, calculateNestingDepth(op));
+      });
 
       func->setAttr("max_block_depth", builder.getI64IntegerAttr(maxFuncDepth));
 
-      llvm::outs() << "Function '" << func.getName()
-                   << "' max block depth: " << maxFuncDepth << '\n';
+      LLVM_DEBUG(llvm::dbgs() << "Function '" << func.getName()
+                              << "' max block depth: " << maxFuncDepth << '\n');
     }
   }
 };
